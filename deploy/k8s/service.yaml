@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: asset-gateway
+  namespace: cloud-console
+  labels:
+    app: asset-gateway
+spec:
+  selector:
+    app: asset-gateway
+  ports:
+    - {name: http, port: 8095, targetPort: 8095}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: asset-gateway
+  namespace: cloud-console
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: asset-gateway
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: {type: Utilization, averageUtilization: 70}
+---
+# 网关挂载：/assets/* → asset-gateway（forwardAuth 身份契约与 /p/console 一致）
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: asset-gateway
+  namespace: cloud-console
+spec:
+  entryPoints: [websecure]
+  routes:
+    - kind: Rule
+      match: PathPrefix(`/assets`)
+      middlewares:
+        - {name: console-auth}
+      services:
+        - {name: asset-gateway, port: 8095}

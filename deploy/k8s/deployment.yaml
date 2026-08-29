@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asset-gateway
+  namespace: cloud-console
+  labels:
+    app: asset-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: asset-gateway
+  template:
+    metadata:
+      labels:
+        app: asset-gateway
+    spec:
+      containers:
+        - name: asset-gateway
+          image: worldkey/asset-gateway:latest
+          ports: [{containerPort: 8095, name: http}]
+          env:
+            - name: ASSET_GATEWAY_PORT
+              value: "8095"
+            - name: CONSOLE_DATABASE_URL
+              valueFrom:
+                configMapKeyRef: {name: console-base-config, key: CONSOLE_DATABASE_URL}
+            - name: CONSOLE_S3_ENDPOINT
+              value: http://minio:9000
+            - name: CONSOLE_S3_BUCKET
+              value: console
+            - name: CONSOLE_S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef: {name: console-base-creds, key: MINIO_ROOT_USER}
+            - name: CONSOLE_S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef: {name: console-base-creds, key: MINIO_ROOT_PASSWORD}
+          readinessProbe:
+            httpGet: {path: /healthz, port: 8095}
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /healthz, port: 8095}
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          resources:
+            requests: {cpu: 100m, memory: 64Mi}
+            limits: {cpu: "1", memory: 256Mi}
