@@ -1,5 +1,5 @@
 # asset-gateway —— 资产分发只读热路径（Go；与 cloud-console 分离镜像线）
-FROM golang:1.26-bookworm AS builder
+FROM golang:1.27-bookworm AS builder
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
