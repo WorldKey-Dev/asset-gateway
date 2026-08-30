@@ -54,9 +54,9 @@ func (f *fakeObjectSource) Get(_ context.Context, key, rangeHeader string) (*Obj
 func newTestServer() (*Server, *fakeObjectSource) {
 	glb := []byte("GLB-BYTES-0123456789")
 	src := &fakeObjectSource{objects: map[string][]byte{
-		"console/c1/t1/convert/a1.glb":   glb,
+		"console/c1/t1/convert/a1.glb":      glb,
 		"console/c1/t1/render/a1-front.png": []byte("PNG-FRONT"),
-		"console/c1/t1/thumb/a1.png":     []byte("PNG-THUMB"),
+		"console/c1/t1/thumb/a1.png":        []byte("PNG-THUMB"),
 	}}
 	store := MapStore{
 		"a1": {
