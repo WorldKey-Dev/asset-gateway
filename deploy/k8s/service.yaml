@@ -28,19 +28,8 @@ spec:
       resource:
         name: cpu
         target: {type: Utilization, averageUtilization: 70}
----
-# 网关挂载：/assets/* → asset-gateway（forwardAuth 身份契约与 /p/console 一致）
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: asset-gateway
-  namespace: cloud-console
-spec:
-  entryPoints: [websecure]
-  routes:
-    - kind: Rule
-      match: PathPrefix(`/assets`)
-      middlewares:
-        - {name: console-auth}
-      services:
-        - {name: asset-gateway, port: 8095}
+
+# /assets/* 的对外路由由网关仓库统一声明（gateway/infra/k8s/gateway.yaml 的
+# gateway-dynamic ConfigMap），本仓库不再自带 IngressRoute：原来那份引用了不存在的
+# websecure entryPoint 与 console-auth middleware，且网关未启用 kubernetesCRD provider，
+# 从未被读取；同时资产分发是公开路由，不走 forwardAuth。

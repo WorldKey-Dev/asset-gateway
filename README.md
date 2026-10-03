@@ -13,7 +13,9 @@ WorldKey 控制台资产分发只读热路径（Go，语言矩阵首个落地组
 | GET | `/assets/{asset_id}/thumbnail` | 缩略图 |
 | GET | `/assets/{asset_id}/renders/{i}` | 第 i 张渲染图（越界 404） |
 
-语义：资产不存在 / 产物未就绪 / 对象缺失 → 404；`Range` → 206 + `Content-Range`；`If-None-Match` 命中 → 304；响应恒带 `Cache-Control: public, max-age=31536000, immutable`（内容寻址资产）。身份由网关层（forwardAuth）承接，本服务不重复鉴权。
+语义：资产不存在 / 产物未就绪 / 对象缺失 → 404；`Range` → 206 + `Content-Range`；`If-None-Match` 命中 → 304（304 只回 ETag，不带 `Cache-Control`，客户端沿用已存指令）；200 / 206 响应带 `Cache-Control: public, max-age=31536000, immutable`（内容寻址资产）。
+
+**本服务不做任何鉴权**，网关侧也把 `/assets` 配成公开路由（挂 forwardAuth 会让 `immutable` 长缓存失去 CDN 共享的意义）。因此 `assets` 表里的每一行都是全网可读的：准入控制由写入方（console）负责，只有确认可公开的资产才允许进表；`asset_id` 可枚举，不要用它承载保密语义。
 
 ## 环境变量
 

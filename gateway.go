@@ -20,7 +20,12 @@ const (
 //	GET /healthz
 //	GET /assets/{asset_id}/glb|thumbnail|renders/{i}
 //
-// ETag / Range / Cache-Control 全支持；身份由网关层（forwardAuth）承接，本服务不重复鉴权。
+// ETag / Range / Cache-Control 全支持。
+//
+// 本服务不做任何鉴权，且网关侧刻意把 /assets 配成公开路由（挂 auth-verify 会让
+// Cache-Control: public, immutable 失去 CDN 共享缓存的意义）。因此 assets 表里的
+// 每一行都是全网可读的：准入控制的责任在写入方（console），只有确认可公开的资产
+// 才允许进表。asset_id 也因而可枚举，不要用它承载任何保密语义。
 type Server struct {
 	store        AssetStore
 	objects      ObjectSource
