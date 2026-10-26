@@ -3,11 +3,11 @@ module github.com/worldkey-dev/asset-gateway
 go 1.26.6
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.45.1
+	github.com/aws/aws-sdk-go-v2 v1.47.4
 	github.com/aws/aws-sdk-go-v2/config v1.33.1
 	github.com/aws/aws-sdk-go-v2/credentials v1.20.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.109.1
-	github.com/aws/smithy-go v1.28.1
+	github.com/aws/smithy-go v1.28.6
 	github.com/jackc/pgx/v5 v5.10.0
 )
 
